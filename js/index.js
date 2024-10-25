@@ -19,21 +19,6 @@ const state = {
   glutenFreeCrust: false
 };
 
-// Query Selectors for price list
-const priceTagPepperoni = document.querySelector('#price-tag-pepperoni');
-const priceTagMushrooms = document.querySelector('#price-tag-mushrooms');
-const priceTagGreenPeppers = document.querySelector('#price-tag-green-peppers');
-const priceTagSauce = document.querySelector('#price-tag-sauce');
-const priceTagCrust = document.querySelector('#price-tag-crust');
-
-// Initial render for prices
-const allPriceTags = document
-  .querySelectorAll('.panel.price ul li')
-  .forEach((li) => {
-    const key = li.dataset.stateName;
-    if (!state[key]) li.classList.add('hidden');
-  });
-
 // This function takes care of rendering the pizza based on the state
 // This function is triggered once at the beginning and every time the state is changed
 function renderEverything() {
@@ -83,9 +68,9 @@ function renderWhiteSauce() {
   // Iteration 2: add/remove the class "sauce-white" of `<section class="sauce">`
   document.querySelectorAll('.sauce').forEach((sauce) => {
     if (state.whiteSauce) {
-      sauce.style.visibility = 'visible';
+      sauce.classList.add('sauce-white');
     } else {
-      sauce.style.visibility = 'hidden';
+      sauce.classList.remove('sauce-white');
     }
   });
 }
@@ -94,9 +79,9 @@ function renderGlutenFreeCrust() {
   // Iteration 2: add/remove the class "crust-gluten-free" of `<section class="crust">`
   document.querySelectorAll('.crust-gluten-free').forEach((crust) => {
     if (state.glutenFreeCrust) {
-      crust.style.visibility = 'visible';
+      crust.classList.add('crust-gluten-free');
     } else {
-      crust.style.visibility = 'hidden';
+      crust.classList.remove('crust-gluten-free');
     }
   });
 }
@@ -112,24 +97,84 @@ function renderButtons() {
   });
 }
 
+// function renderPrice() {
+//   // Iteration 4: change the HTML of `<aside class="panel price">`
+//   const priceTagTotal = document.querySelector('#total-price');
+
+//   const priceTotal = [...Object.keys(ingredients)].reduce(
+//     (sum, key) => (sum += state[key] ? ingredients[key].price : 0),
+//     10
+//   );
+
+//   priceTagTotal.textContent = asCurrency(priceTotal);
+
+//   // Query Selectors for price list
+//   const priceTagPepperoni = document.querySelector('#price-tag-pepperoni');
+//   const priceTagMushrooms = document.querySelector('#price-tag-mushrooms');
+//   const priceTagGreenPeppers = document.querySelector(
+//     '#price-tag-green-peppers'
+//   );
+//   const priceTagSauce = document.querySelector('#price-tag-sauce');
+//   const priceTagCrust = document.querySelector('#price-tag-crust');
+
+//   document.querySelectorAll('.panel.price ul li').forEach((li) => {
+//     const key = li.dataset.stateName;
+
+//     switch (key) {
+//       case 'pepperoni':
+//       case 'mushrooms':
+//       case 'greenPeppers':
+//         if (state[key]) li.classList.add('show');
+//         if (!state[key]) li.classList.remove('show');
+//         break;
+//       case 'whiteSauce':
+//         if (state[key]) li.classList.add('sauce-white');
+//         if (!state[key]) li.classList.remove('sauce-white');
+//         break;
+//       case 'glutenFreeCrust':
+//         if (state[key]) li.classList.add('crust-gluten-free');
+//         if (!state[key]) li.classList.remove('crust-gluten-free');
+//         break;
+
+//       default:
+//         break;
+//     }
+//   });
+
+// function asCurrency(number) {
+//   return number.toLocaleString('en-US', {
+//     style: 'currency',
+//     currency: 'USD',
+//     maximumFractionDigits: 0
+//   });
+// }}
+
+// Lab solution
 function renderPrice() {
   // Iteration 4: change the HTML of `<aside class="panel price">`
-  const priceTagTotal = document.querySelector('#total-price');
+  let totalPrice = basePrice;
 
-  const priceTotal = [...Object.keys(ingredients)].reduce(
-    (sum, key) => (sum += state[key] ? ingredients[key].price : 0),
-    10
-  );
+  let priceIngredientLi = '';
 
-  priceTagTotal.textContent = asCurrency(priceTotal);
-
-  function asCurrency(number) {
-    return number.toLocaleString('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      maximumFractionDigits: 0
-    });
+  for (const ingredient in ingredients) {
+    if (state[ingredient]) {
+      priceIngredientLi += `
+          <li>$ ${ingredients[ingredient].price} ${ingredients[ingredient].name}</li>
+        `;
+      totalPrice += ingredients[ingredient].price;
+    }
   }
+
+  const pricePanelHTML = `
+      <h2>Your Pizza's price</h2>
+      <b>$${basePrice} cheese pizza</b>
+      <ul>
+        ${priceIngredientLi}
+      </ul>
+      <strong>$ ${totalPrice}</strong>
+    `;
+
+  document.querySelector('.panel.price').innerHTML = pricePanelHTML;
 }
 
 renderEverything();
@@ -139,7 +184,6 @@ document
   .querySelector('.btn.btn-pepperoni')
   .addEventListener('click', function () {
     state.pepperoni = !state.pepperoni;
-    priceTagPepperoni.classList.toggle('hidden');
     renderEverything();
   });
 
@@ -148,7 +192,6 @@ document
   .querySelector('.btn.btn-mushrooms')
   .addEventListener('click', function () {
     state.mushrooms = !state.mushrooms;
-    priceTagMushrooms.classList.toggle('hidden');
     renderEverything();
   });
 
@@ -157,20 +200,17 @@ document
   .querySelector('.btn.btn-green-peppers')
   .addEventListener('click', function () {
     state.greenPeppers = !state.greenPeppers;
-    priceTagGreenPeppers.classList.toggle('hidden');
     renderEverything();
   });
 
 // Iteration 2: Add click event listener on `<button class="btn btn-sauce">`
 document.querySelector('.btn.btn-sauce').addEventListener('click', function () {
   state.whiteSauce = !state.whiteSauce;
-  priceTagSauce.classList.toggle('hidden');
   renderEverything();
 });
 
 // Iteration 2: Add click event listener on `<button class="btn btn-crust">`
 document.querySelector('.btn.btn-crust').addEventListener('click', function () {
   state.glutenFreeCrust = !state.glutenFreeCrust;
-  priceTagCrust.classList.toggle('hidden');
   renderEverything();
 });

@@ -370,13 +370,18 @@ p.description {
 }
 
 .price li {
-  margin: 5px 20px 0;
-  color : #666;
+  margin    : 5px 20px 0;
+  color     : #666;
+  /* display: none; */
+
 }
 
-.price li.hidden {
-  display: none;
-}
+/* .price li.show,
+.price li.sauce-white,
+.price li.crust-gluten-free {
+  display: block;
+} */
+
 
 .price li:before {
   content: '+ ';
