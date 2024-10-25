@@ -19,6 +19,21 @@ const state = {
   glutenFreeCrust: false
 };
 
+// Query Selectors for price list
+const priceTagPepperoni = document.querySelector('#price-tag-pepperoni');
+const priceTagMushrooms = document.querySelector('#price-tag-mushrooms');
+const priceTagGreenPeppers = document.querySelector('#price-tag-green-peppers');
+const priceTagSauce = document.querySelector('#price-tag-sauce');
+const priceTagCrust = document.querySelector('#price-tag-crust');
+
+// Initial render for prices
+const allPriceTags = document
+  .querySelectorAll('.panel.price ul li')
+  .forEach((li) => {
+    const key = li.dataset.stateName;
+    if (!state[key]) li.classList.add('hidden');
+  });
+
 // This function takes care of rendering the pizza based on the state
 // This function is triggered once at the beginning and every time the state is changed
 function renderEverything() {
@@ -99,6 +114,22 @@ function renderButtons() {
 
 function renderPrice() {
   // Iteration 4: change the HTML of `<aside class="panel price">`
+  const priceTagTotal = document.querySelector('#total-price');
+
+  const priceTotal = [...Object.keys(ingredients)].reduce(
+    (sum, key) => (sum += state[key] ? ingredients[key].price : 0),
+    10
+  );
+
+  priceTagTotal.textContent = asCurrency(priceTotal);
+
+  function asCurrency(number) {
+    return number.toLocaleString('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: 0
+    });
+  }
 }
 
 renderEverything();
@@ -108,6 +139,7 @@ document
   .querySelector('.btn.btn-pepperoni')
   .addEventListener('click', function () {
     state.pepperoni = !state.pepperoni;
+    priceTagPepperoni.classList.toggle('hidden');
     renderEverything();
   });
 
@@ -116,6 +148,7 @@ document
   .querySelector('.btn.btn-mushrooms')
   .addEventListener('click', function () {
     state.mushrooms = !state.mushrooms;
+    priceTagMushrooms.classList.toggle('hidden');
     renderEverything();
   });
 
@@ -124,17 +157,20 @@ document
   .querySelector('.btn.btn-green-peppers')
   .addEventListener('click', function () {
     state.greenPeppers = !state.greenPeppers;
+    priceTagGreenPeppers.classList.toggle('hidden');
     renderEverything();
   });
 
 // Iteration 2: Add click event listener on `<button class="btn btn-sauce">`
 document.querySelector('.btn.btn-sauce').addEventListener('click', function () {
   state.whiteSauce = !state.whiteSauce;
+  priceTagSauce.classList.toggle('hidden');
   renderEverything();
 });
 
 // Iteration 2: Add click event listener on `<button class="btn btn-crust">`
 document.querySelector('.btn.btn-crust').addEventListener('click', function () {
   state.glutenFreeCrust = !state.glutenFreeCrust;
+  priceTagCrust.classList.toggle('hidden');
   renderEverything();
 });
